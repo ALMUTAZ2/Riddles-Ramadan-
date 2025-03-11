@@ -1,557 +1,171 @@
-  import React, { useState, useEffect } from 'react';
-  import { Button } from "@/components/ui/button";
-  import { Card } from "@/components/ui/card";
-  import { Label } from "@/components/ui/label";
-  import { Input } from "@/components/ui/input";
-  import { Moon, Star, Trophy, Sparkles, Timer } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Moon, Star, Trophy, Sparkles, Timer } from 'lucide-react';
 
-  const RamadanQuiz = () => {
-    // تعريف حالة التطبيق
-    const [gameState, setGameState] = useState({
-      playerName: "",
-      isStarted: false,
-      showCountdown: false,
-      countdown: 5,
-      currentQuestionIndex: 0,
-      selectedAnswer: null,
-      score: 0,
-      showResults: false,
-      timeLeft: 10,
-      answers: [],
-      currentDay: new Date().getDate() // يحصل على اليوم الحالي
-    });
+const RamadanQuiz = () => {
+  // تعريف حالة التطبيق
+  const [gameState, setGameState] = useState({
+    playerName: "",
+    isStarted: false,
+    showCountdown: false,
+    countdown: 5,
+    currentQuestionIndex: 0,
+    selectedAnswer: null,
+    score: 0,
+    showResults: false,
+    timeLeft: 10,
+    answers: [],
+    currentDay: new Date().getDate() // يحصل على اليوم الحالي
+  });
 
-    // قاعدة بيانات الأسئلة اليومية
-    const dailyQuestions = {
-  1: [
-    {
-      question: "في أي عام فُرض الصيام على المسلمين؟",
-      options: ["السنة الأولى للهجرة", "السنة الثانية للهجرة", "السنة الثالثة للهجرة", "السنة الرابعة للهجرة"],
-      correct: 1,
-      explanation: "فُرض الصيام في السنة الثانية للهجرة."
-    }
-  ],
-  2: [
-    {
-      question: "ما هي أول معركة في الإسلام والتي وقعت في شهر رمضان؟",
-      options: ["معركة أحد", "معركة الخندق", "معركة بدر", "معركة حنين"],
-      correct: 2,
-      explanation: "وقعت معركة بدر في شهر رمضان."
-    }
-  ],
-  3: [
-    {
-      question: "في أي عام تم فتح مكة في شهر رمضان؟",
-      options: ["السنة السادسة للهجرة", "السنة السابعة للهجرة", "السنة الثامنة للهجرة", "السنة التاسعة للهجرة"],
-      correct: 2,
-      explanation: "تم فتح مكة في السنة الثامنة للهجرة."
-    }
-  ],
-  4: [
-    {
-      question: "من هو الصحابي الذي لُقب بـ 'أمين الأمة' وتوفي في شهر رمضان؟",
-      options: ["أبو عبيدة بن الجراح", "سعد بن أبي وقاص", "عبد الرحمن بن عوف", "أبو هريرة"],
-      correct: 0,
-      explanation: "أبو عبيدة بن الجراح لُقب بـ 'أمين الأمة' وتوفي في رمضان."
-    }
-  ],
-  5: [
-    {
-      question: "في أي ليلة من رمضان نزل القرآن الكريم؟",
-      options: ["ليلة القدر", "ليلة النصف من رمضان", "أول ليلة من رمضان", "آخر ليلة من رمضان"],
-      correct: 0,
-      explanation: "نزل القرآن الكريم في ليلة القدر."
-    }
-  ],
-  6: [
-    {
-      question: "من هو الخليفة الراشدي الذي استشهد في شهر رمضان؟",
-      options: ["أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن أبي طالب"],
-      correct: 3,
-      explanation: "علي بن أبي طالب استشهد في شهر رمضان."
-    }
-  ],
-  7: [
-    {
-      question: "متى وقعت معركة عين جالوت التي انتصر فيها المسلمون على المغول؟",
-      options: ["25 رمضان 658 هـ", "15 رمضان 659 هـ", "5 رمضان 657 هـ", "10 رمضان 660 هـ"],
-      correct: 0,
-      explanation: "وقعت معركة عين جالوت في 25 رمضان 658 هـ."
-    }
-  ],
-  8: [
-    {
-      question: "من هو القائد المسلم الذي انتصر في معركة عين جالوت؟",
-      options: ["صلاح الدين الأيوبي", "قطز", "بيبرس", "نور الدين زنكي"],
-      correct: 1,
-      explanation: "القائد المسلم الذي انتصر في معركة عين جالوت هو قطز."
-    }
-  ],
-  9: [
-    {
-      question: "في أي عام هجري تم فتح الأندلس؟",
-      options: ["92 هـ", "93 هـ", "94 هـ", "95 هـ"],
-      correct: 0,
-      explanation: "تم فتح الأندلس في عام 92 هـ."
-    }
-  ],
-  10: [
-    {
-      question: "من هو القائد الذي قاد فتح الأندلس؟",
-      options: ["موسى بن نصير", "طارق بن زياد", "عقبة بن نافع", "عمرو بن العاص"],
-      correct: 1,
-      explanation: "طارق بن زياد هو القائد الذي قاد فتح الأندلس."
-    }
-  ],
-  11: [
-    {
-      question: "في أي رمضان نزلت أول آية من القرآن الكريم؟",
-      options: ["رمضان من السنة الأربعين لميلاد النبي محمد ﷺ", "رمضان من السنة الأولى للبعثة", "رمضان من السنة الثانية للبعثة", "رمضان من السنة الثالثة للبعثة"],
-      correct: 0,
-      explanation: "نزلت أول آية من القرآن الكريم في رمضان من السنة الأربعين لميلاد النبي محمد ﷺ."
-    }
-  ],
-  12: [
-    {
-      question: "في أي عام هجري فُتحت مصر؟",
-      options: ["18 هـ", "19 هـ", "20 هـ", "21 هـ"],
-      correct: 2,
-      explanation: "فُتحت مصر في عام 20 هـ."
-    }
-  ],
-  13: [
-    {
-      question: "من هو الصحابي الذي فتح مصر؟",
-      options: ["خالد بن الوليد", "سعد بن أبي وقاص", "عمرو بن العاص", "أبو عبيدة بن الجراح"],
-      correct: 2,
-      explanation: "عمرو بن العاص هو الصحابي الذي فتح مصر."
-    }
-  ],
-  14: [
-    {
-      question: "في أي عام هجري وقعت معركة حطين؟",
-      options: ["583 هـ", "584 هـ", "585 هـ", "586 هـ"],
-      correct: 0,
-      explanation: "وقعت معركة حطين في عام 583 هـ."
-    }
-  ],
-  15: [
-    {
-      question: "من هو القائد المسلم الذي انتصر في معركة حطين؟",
-      options: ["نور الدين زنكي", "صلاح الدين الأيوبي", "قطز", "بيبرس"],
-      correct: 1,
-      explanation: "صلاح الدين الأيوبي هو القائد المسلم الذي انتصر في معركة حطين."
-    }
-  ],
-  16: [
-    {
-      question: "في أي عام فُتحت القسطنطينية على يد محمد الفاتح؟",
-      options: ["855 هـ", "856 هـ", "857 هـ", "858 هـ"],
-      correct: 2,
-      explanation: "فُتحت القسطنطينية في عام 857 هـ."
-    }
-  ],
-  17: [
-    {
-      question: "في أي شهر فُتحت القسطنطينية؟",
-      options: ["رجب", "شعبان", "رمضان", "شوال"],
-      correct: 2,
-      explanation: "فُتحت القسطنطينية في شهر رمضان."
-    }
-  ],
-  18: [
-    {
-      question: "من هو الصحابي الذي أول من جهر بالقرآن في مكة؟",
-      options: ["عمر بن الخطاب", "عثمان بن عفان", "علي بن أبي طالب", "عبد الله بن مسعود"],
-      correct: 3,
-      explanation: "عبد الله بن مسعود هو أول من جهر بالقرآن في مكة."
-    }
-  ],
-  19: [
-    {
-      question: "في أي عام هجري توفي الإمام البخاري؟",
-      options: ["254 هـ", "255 هـ", "256 هـ", "257 هـ"],
-      correct: 2,
-      explanation: "توفي الإمام البخاري في عام 256 هـ."
-    }
-  ],
-  20: [
-    {
-      question: "في أي شهر توفي الإمام البخاري؟",
-      options: ["شعبان", "رمضان", "شوال", "ذو القعدة"],
-      correct: 1,
-      explanation: "توفي الإمام البخاري في شهر رمضان."
-    }
-  ],
-  21: [
-    {
-      question: "في أي عام كانت غزوة تبوك؟",
-      options: ["السنة الثامنة للهجرة", "السنة التاسعة للهجرة", "السنة العاشرة للهجرة", "السنة الحادية عشرة للهجرة"],
-      correct: 1,
-      explanation: "وقعت غزوة تبوك في السنة التاسعة للهجرة."
-    }
-  ],
-  22: [
-    {
-      question: "من هو الصحابي الذي لُقب بـ 'ذو النورين'؟",
-      options: ["أبو بكر الصديق", "عمر بن الخطاب", "عثمان بن عفان", "علي بن أبي طالب"],
-      correct: 2,
-      explanation: "عثمان بن عفان لُقب بـ 'ذو النورين'."
-    }
-  ],
-  23: [
-    {
-      question: "في أي عام هجري وقعت معركة القادسية؟",
-      options: ["14 هـ", "15 هـ", "16 هـ", "17 هـ"],
-      correct: 1,
-      explanation: "وقعت معركة القادسية في عام 15 هـ."
-    }
-  ],
-  24: [
-    {
-      question: "من هو القائد المسلم في معركة القادسية؟",
-      options: ["خالد بن الوليد", "سعد بن أبي وقاص", "عمرو بن العاص", "أبو عبيدة بن الجراح"],
-      correct: 1,
-      explanation: "سعد بن أبي وقاص هو القائد المسلم في معركة القادسية."
-    }
-  ],
-  25: [
-    {
-      question: "في أي عام هجري وقعت معركة اليرموك؟",
-      options: ["13 هـ", "14 هـ", "15 هـ", "16 هـ"],
-      correct: 0,
-      explanation: "وقعت معركة اليرموك في عام 13 هـ."
-    }
-  ],
-  26: [
-    {
-      question: "من هو القائد المسلم في معركة اليرموك؟",
-      options: ["خالد بن الوليد", "سعد بن أبي وقاص", "عمرو بن العاص", "أبو عبيدة بن الجراح"],
-      correct: 0,
-      explanation: "خالد بن الوليد هو القائد المسلم في معركة اليرموك."
-    }
-  ],
-  27: [
-    {
-      question: "في أي عام هجري وقعت معركة نهاوند؟",
-      options: ["19 هـ", "20 هـ", "21 هـ", "22 هـ"],
-      correct: 2,
-      explanation: "وقعت معركة نهاوند في عام 21 هـ."
-    }
-  ],
-  28: [
-    {
-      question: "ما هو اللقب الذي أطلق على معركة نهاوند؟",
-      options: ["فتح الفتوح", "يوم الفرقان", "يوم الخلاص", "يوم النصر المبين"],
-      correct: 0,
-      explanation: "لقبت معركة نهاوند بـ 'فتح الفتوح'."
-    }
-  ],
-  29: [
-    {
-      question: "في أي عام هجري فُتحت بيت المقدس في عهد عمر بن الخطاب؟",
-      options: ["14 هـ", "15 هـ", "16 هـ", "17 هـ"],
-      correct: 1,
-      explanation: "فُتحت بيت المقدس في عام 15 هـ."
-    }
-  ],
-  30: [
-    {
-      question: "من هو الصحابي الذي قاد فتح بيت المقدس؟",
-      options: ["خالد بن الوليد", "سعد بن أبي وقاص", "عمرو بن العاص", "أبو عبيدة بن الجراح"],
-      correct: 3,
-      explanation: "أبو عبيدة بن الجراح هو الصحابي الذي قاد فتح بيت المقدس."
-    }
-  ],
-  31: [
-    {
-      question: "في أي عام هجري تم استرداد بيت المقدس على يد صلاح الدين الأيوبي؟",
-      options: ["583 هـ", "584 هـ", "585 هـ", "586 هـ"],
-      correct: 2,
-      explanation: "تم استرداد بيت المقدس في عام 585 هـ."
-    }
-  ],
-  32: [
-    {
-      question: "في أي شهر تم استرداد بيت المقدس على يد صلاح الدين الأيوبي؟",
-      options: ["رجب", "شعبان", "رمضان", "شوال"],
-      correct: 2,
-      explanation: "تم استرداد بيت المقدس في شهر رمضان."
-    }
-  ],
-  33: [
-    {
-      question: "في أي عام هجري وقعت معركة ملاذكرد؟",
-      options: ["463 هـ", "464 هـ", "465 هـ", "466 هـ"],
-      correct: 0,
-      explanation: "وقعت معركة ملاذكرد في عام 463 هـ."
-    }
-  ],
-  34: [
-    {
-      question: "من هو القائد المسلم الذي انتصر في معركة ملاذكرد؟",
-      options: ["ألب أرسلان", "طغرل بك", "نظام الملك", "ملكشاه"],
-      correct: 0,
-      explanation: "ألب أرسلان هو القائد المسلم الذي انتصر في معركة ملاذكرد."
-    }
-  ],
-  35: [
-    {
-      question: "في أي عام هجري وقعت معركة الزلاقة؟",
-      options: ["478 هـ", "479 هـ", "480 هـ", "481 هـ"],
-      correct: 1,
-      explanation: "وقعت معركة الزلاقة في عام 479 هـ."
-    }
-  ],
-  36: [
-    {
-      question: "من هو القائد المسلم الذي انتصر في معركة الزلاقة؟",
-      options: ["طارق بن زياد", "يوسف بن تاشفين", "المعتمد بن عباد", "المعتصم بالله"],
-      correct: 1,
-      explanation: "يوسف بن تاشفين هو القائد المسلم الذي انتصر في معركة الزلاقة."
-    }
-  ],
-  37: [
-    {
-      question: "في أي عام هجري تأسست الدولة الأموية؟",
-      options: ["40 هـ", "41 هـ", "42 هـ", "43 هـ"],
-      correct: 0,
-      explanation: "تأسست الدولة الأموية في عام 40 هـ."
-    }
-  ],
-  38: [
-    {
-      question: "من هو مؤسس الدولة الأموية؟",
-      options: ["عبد الملك بن مروان", "معاوية بن أبي سفيان", "يزيد بن معاوية", "مروان بن الحكم"],
-      correct: 1,
-      explanation: "معاوية بن أبي سفيان هو مؤسس الدولة الأموية."
-    }
-  ],
-  39: [
-    {
-      question: "في أي عام هجري تأسست الدولة العباسية؟",
-      options: ["130 هـ", "131 هـ", "132 هـ", "133 هـ"],
-      correct: 2,
-      explanation: "تأسست الدولة العباسية في عام 132 هـ."
-    }
-  ],
-  40: [
-    {
-      question: "من هو مؤسس الدولة العباسية؟",
-      options: ["أبو العباس السفاح", "أبو جعفر المنصور", "هارون الرشيد", "المأمون"],
-      correct: 0,
-      explanation: "أبو العباس السفاح هو مؤسس الدولة العباسية."
-    }
-  ],
-  41: [
-    {
-      question: "في أي عام هجري تأسست الدولة الفاطمية؟",
-      options: ["296 هـ", "297 هـ", "298 هـ", "299 هـ"],
-      correct: 1,
-      explanation: "تأسست الدولة الفاطمية في عام 297 هـ."
-    }
-  ],
-  42: [
-    {
-      question: "من هو مؤسس الدولة الفاطمية؟",
-      options: ["المعز لدين الله", "العزيز بالله", "الحاكم بأمر الله", "عبيد الله المهدي"],
-      correct: 3,
-      explanation: "عبيد الله المهدي هو مؤسس الدولة الفاطمية."
-    }
-  ],
-  43: [
-    {
-      question: "في أي عام هجري تأسست الدولة الأيوبية؟",
-      options: ["564 هـ", "565 هـ", "566 هـ", "567 هـ"],
-      correct: 0,
-      explanation: "تأسست الدولة الأيوبية في عام 564 هـ."
-    }
-  ],
-  44: [
-    {
-      question: "من هو مؤسس الدولة الأيوبية؟",
-      options: ["صلاح الدين الأيوبي", "العادل أبو بكر", "الكامل محمد", "نجم الدين أيوب"],
-      correct: 0,
-      explanation: "صلاح الدين الأيوبي هو مؤسس الدولة الأيوبية."
-    }
-  ],
-  45: [
-    {
-      question: "في أي عام هجري تأسست دولة المماليك؟",
-      options: ["647 هـ", "648 هـ", "649 هـ", "650 هـ"],
-      correct: 1,
-      explanation: "تأسست دولة المماليك في عام 648 هـ."
-    }
-  ],
-  46: [
-    {
-      question: "من هي أول سلطانة حكمت مصر في عصر المماليك؟",
-      options: ["شجرة الدر", "زبيدة", "خاتون", "عائشة"],
-      correct: 0,
-      explanation: "شجرة الدر هي أول سلطانة حكمت مصر في عصر المماليك."
-    }
-  ],
-  47: [
-    {
-      question: "في أي عام هجري تأسست الدولة العثمانية؟",
-      options: ["698 هـ", "699 هـ", "700 هـ", "701 هـ"],
-      correct: 1,
-      explanation: "تأسست الدولة العثمانية في عام 699 هـ."
-    }
-  ],
-  48: [
-    {
-      question: "من هو مؤسس الدولة العثمانية؟",
-      options: ["أورخان بن عثمان", "عثمان بن أرطغرل", "مراد الأول", "بايزيد الأول"],
-      correct: 1,
-      explanation: "عثمان بن أرطغرل هو مؤسس الدولة العثمانية."
-    }
-  ],
-  49: [
-    {
-      question: "في أي عام هجري سقطت الخلافة العباسية في بغداد؟",
-      options: ["655 هـ", "656 هـ", "657 هـ", "658 هـ"],
-      correct: 1,
-      explanation: "سقطت الخلافة العباسية في بغداد في عام 656 هـ."
-    }
-  ],
-  50: [
-    {
-      question: "من هو آخر خليفة عباسي في بغداد؟",
-      options: ["المستعصم بالله", "المستنصر بالله", "المستكفي بالله", "المعتصم بالله"],
-      correct: 0,
-      explanation: "المستعصم بالله هو آخر خليفة عباسي في بغداد."
-    }
-  ],
-  51: [
-    {
-      question: "في أي عام هجري وقعت معركة مرج دابق؟",
-      options: ["921 هـ", "922 هـ", "923 هـ", "924 هـ"],
-      correct: 1,
-      explanation: "وقعت معركة مرج دابق في عام 922 هـ."
-    }
-  ],
-  52: [
-    {
-      question: "من هو السلطان العثماني الذي انتصر في معركة مرج دابق؟",
-      options: ["محمد الفاتح", "سليم الأول", "سليمان القانوني", "مراد الرابع"],
-      correct: 1,
-      explanation: "سليم الأول هو السلطان العثماني الذي انتصر في معركة مرج دابق."
-    }
-  ],
-  53: [
-    {
-      question: "في أي عام هجري وقعت معركة الريدانية؟",
-      options: ["922 هـ", "923 هـ", "924 هـ", "925 هـ"],
-      correct: 1,
-      explanation: "وقعت معركة الريدانية في عام 923 هـ."
-    }
-  ],
-  54: [
-    {
-      question: "من هو آخر سلطان مملوكي حكم مصر؟",
-      options: ["قانصوه الغوري", "طومان باي", "الأشرف قايتباي", "قلاوون"],
-      correct: 1,
-      explanation: "طومان باي هو آخر سلطان مملوكي حكم مصر."
-    }
-  ],
-  55: [
-    {
-      question: "في أي عام هجري وقعت معركة بلاط الشهداء؟",
-      options: ["112 هـ", "113 هـ", "114 هـ", "115 هـ"],
-      correct: 2,
-      explanation: "وقعت معركة بلاط الشهداء في عام 114 هـ."
-    }
-  ],
-  56: [
-    {
-      question: "من هو القائد المسلم في معركة بلاط الشهداء؟",
-      options: ["طارق بن زياد", "عبد الرحمن الغافقي", "موسى بن نصير", "عقبة بن نافع"],
-      correct: 1,
-      explanation: "عبد الرحمن الغافقي هو القائد المسلم في معركة بلاط الشهداء."
-    }
-  ],
-  57: [
-    {
-      question: "في أي عام هجري سقطت غرناطة آخر معاقل المسلمين في الأندلس؟",
-      options: ["896 هـ", "897 هـ", "898 هـ", "899 هـ"],
-      correct: 1,
-      explanation: "سقطت غرناطة في عام 897 هـ."
-    }
-  ]
-};
-    // دالة حساب لون المؤقت
-    const getTimerColor = (timeLeft) => {
-      const percentage = timeLeft / 10;
-      const colors = {
-        red: [239, 68, 68],
-        yellow: [234, 179, 8],
-        green: [34, 197, 94]
-      };
-
-      let color;
-      if (percentage > 0.6) {
-        const factor = (percentage - 0.6) / 0.4;
-        color = [
-          colors.yellow[0] + (colors.green[0] - colors.yellow[0]) * factor,
-          colors.yellow[1] + (colors.green[1] - colors.yellow[1]) * factor,
-          colors.yellow[2] + (colors.green[2] - colors.yellow[2]) * factor
-        ];
-      } else {
-        const factor = percentage / 0.6;
-        color = [
-          colors.red[0] + (colors.yellow[0] - colors.red[0]) * factor,
-          colors.red[1] + (colors.yellow[1] - colors.red[1]) * factor,
-          colors.red[2] + (colors.yellow[2] - colors.red[2]) * factor
-        ];
+  // قاعدة بيانات الأسئلة اليومية
+  const dailyQuestions = {
+    1: [
+      {
+        question: "في أي عام فُرض الصيام على المسلمين؟",
+        options: ["السنة الأولى للهجرة", "السنة الثانية للهجرة", "السنة الثالثة للهجرة", "السنة الرابعة للهجرة"],
+        correct: 1,
+        explanation: "فُرض الصيام في السنة الثانية للهجرة."
       }
+    ],
+    2: [
+      {
+        question: "ما هي أول معركة في الإسلام والتي وقعت في شهر رمضان؟",
+        options: ["معركة أحد", "معركة الخندق", "معركة بدر", "معركة حنين"],
+        correct: 2,
+        explanation: "وقعت معركة بدر في شهر رمضان."
+      }
+    ],
+    3: [
+      {
+        question: "في أي عام تم فتح مكة في شهر رمضان؟",
+        options: ["السنة السادسة للهجرة", "السنة السابعة للهجرة", "السنة الثامنة للهجرة", "السنة التاسعة للهجرة"],
+        correct: 2,
+        explanation: "تم فتح مكة في السنة الثامنة للهجرة."
+      }
+    ],
+    // يمكن إضافة باقي الأسئلة هنا
+    11: [
+      {
+        question: "في أي رمضان نزلت أول آية من القرآن الكريم؟",
+        options: ["رمضان من السنة الأربعين لميلاد النبي محمد ﷺ", "رمضان من السنة الأولى للبعثة", "رمضان من السنة الثانية للبعثة", "رمضان من السنة الثالثة للبعثة"],
+        correct: 0,
+        explanation: "نزلت أول آية من القرآن الكريم في رمضان من السنة الأربعين لميلاد النبي محمد ﷺ."
+      }
+    ]
+  };
 
-      return `rgb(${Math.round(color[0])}, ${Math.round(color[1])}, ${Math.round(color[2])})`;
+  // دالة حساب لون المؤقت
+  const getTimerColor = (timeLeft) => {
+    const percentage = timeLeft / 10;
+    const colors = {
+      red: [239, 68, 68],
+      yellow: [234, 179, 8],
+      green: [34, 197, 94]
     };
 
-    // تأثيرات للعد التنازلي
-    useEffect(() => {
-      if (gameState.showCountdown && gameState.countdown > 0) {
-        const timer = setTimeout(() => {
-          setGameState(prev => ({ ...prev, countdown: prev.countdown - 1 }));
-        }, 1000);
-        return () => clearTimeout(timer);
-      } else if (gameState.showCountdown && gameState.countdown === 0) {
-        setGameState(prev => ({
-          ...prev,
-          showCountdown: false,
-          isStarted: true,
-          timeLeft: 10
-        }));
-      }
-    }, [gameState.countdown, gameState.showCountdown]);
+    let color;
+    if (percentage > 0.6) {
+      const factor = (percentage - 0.6) / 0.4;
+      color = [
+        colors.yellow[0] + (colors.green[0] - colors.yellow[0]) * factor,
+        colors.yellow[1] + (colors.green[1] - colors.yellow[1]) * factor,
+        colors.yellow[2] + (colors.green[2] - colors.yellow[2]) * factor
+      ];
+    } else {
+      const factor = percentage / 0.6;
+      color = [
+        colors.red[0] + (colors.yellow[0] - colors.red[0]) * factor,
+        colors.red[1] + (colors.yellow[1] - colors.red[1]) * factor,
+        colors.red[2] + (colors.yellow[2] - colors.red[2]) * factor
+      ];
+    }
 
-    // تأثيرات للمؤقت
-    useEffect(() => {
-      let timer;
-      if (gameState.isStarted && !gameState.showResults && gameState.timeLeft > 0) {
-        timer = setInterval(() => {
-          setGameState(prev => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
-        }, 1000);
-      }
+    return `rgb(${Math.round(color[0])}, ${Math.round(color[1])}, ${Math.round(color[2])})`;
+  };
 
-      if (gameState.timeLeft === 0) {
-        handleTimeUp();
-      }
+  // تأثيرات للعد التنازلي
+  useEffect(() => {
+    if (gameState.showCountdown && gameState.countdown > 0) {
+      const timer = setTimeout(() => {
+        setGameState(prev => ({ ...prev, countdown: prev.countdown - 1 }));
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (gameState.showCountdown && gameState.countdown === 0) {
+      setGameState(prev => ({
+        ...prev,
+        showCountdown: false,
+        isStarted: true,
+        timeLeft: 10
+      }));
+    }
+  }, [gameState.countdown, gameState.showCountdown]);
 
-      return () => clearInterval(timer);
-    }, [gameState.timeLeft, gameState.isStarted, gameState.showResults]);
+  // تأثيرات للمؤقت
+  useEffect(() => {
+    let timer;
+    if (gameState.isStarted && !gameState.showResults && gameState.timeLeft > 0) {
+      timer = setInterval(() => {
+        setGameState(prev => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
+      }, 1000);
+    }
 
-    // دالة بدء العد التنازلي
-    const startCountdown = () => {
-      if (gameState.playerName.trim()) {
-        setGameState(prev => ({ ...prev, showCountdown: true, countdown: 5 }));
-      }
+    if (gameState.timeLeft === 0) {
+      handleTimeUp();
+    }
+
+    return () => clearInterval(timer);
+  }, [gameState.timeLeft, gameState.isStarted, gameState.showResults]);
+
+  // دالة بدء العد التنازلي
+  const startCountdown = () => {
+    if (gameState.playerName.trim()) {
+      setGameState(prev => ({ ...prev, showCountdown: true, countdown: 5 }));
+    }
+  };
+
+  // دالة معالجة انتهاء الوقت
+  const handleTimeUp = () => {
+    const questions = dailyQuestions[gameState.currentDay] || [];
+    if (gameState.currentQuestionIndex < questions.length - 1) {
+      setGameState(prev => ({
+        ...prev,
+        currentQuestionIndex: prev.currentQuestionIndex + 1,
+        selectedAnswer: null,
+        timeLeft: 10
+      }));
+    } else {
+      const finalScore = gameState.answers.filter(answer => answer?.correct).length;
+      setGameState(prev => ({
+        ...prev,
+        score: finalScore,
+        showResults: true
+      }));
+    }
+  };
+
+  // دالة معالجة اختيار الإجابة
+  const handleAnswerSelect = (idx) => {
+    const questions = dailyQuestions[gameState.currentDay] || [];
+    const currentQuestion = questions[gameState.currentQuestionIndex];
+    
+    const newAnswers = [...gameState.answers];
+    newAnswers[gameState.currentQuestionIndex] = {
+      selected: idx,
+      correct: idx === currentQuestion.correct,
+      explanation: currentQuestion.explanation
     };
 
-    // دالة معالجة انتهاء الوقت
-    const handleTimeUp = () => {
-      const questions = dailyQuestions[gameState.currentDay] || [];
+    setGameState(prev => ({
+      ...prev,
+      answers: newAnswers,
+      selectedAnswer: idx
+    }));
+
+    setTimeout(() => {
       if (gameState.currentQuestionIndex < questions.length - 1) {
         setGameState(prev => ({
           ...prev,
@@ -560,231 +174,195 @@
           timeLeft: 10
         }));
       } else {
-        const finalScore = gameState.answers.filter(answer => answer?.correct).length;
+        const finalScore = newAnswers.filter(answer => answer?.correct).length;
         setGameState(prev => ({
           ...prev,
           score: finalScore,
           showResults: true
         }));
       }
-    };
+    }, 2000);
+  };
 
-    // دالة معالجة اختيار الإجابة
-    const handleAnswerSelect = (idx) => {
-      const questions = dailyQuestions[gameState.currentDay] || [];
-      const currentQuestion = questions[gameState.currentQuestionIndex];
-      
-      const newAnswers = [...gameState.answers];
-      newAnswers[gameState.currentQuestionIndex] = {
-        selected: idx,
-        correct: idx === currentQuestion.correct,
-        explanation: currentQuestion.explanation
-      };
-
-      setGameState(prev => ({
-        ...prev,
-        answers: newAnswers,
-        selectedAnswer: idx
-      }));
-
-      setTimeout(() => {
-        if (gameState.currentQuestionIndex < questions.length - 1) {
-          setGameState(prev => ({
-            ...prev,
-            currentQuestionIndex: prev.currentQuestionIndex + 1,
-            selectedAnswer: null,
-            timeLeft: 10
-          }));
-        } else {
-          const finalScore = newAnswers.filter(answer => answer?.correct).length;
-          setGameState(prev => ({
-            ...prev,
-            score: finalScore,
-            showResults: true
-          }));
-        }
-      }, 2000);
-    };
-
-    // عرض شاشة البداية
-    if (!gameState.isStarted && !gameState.showCountdown) {
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center p-6">
-          <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-3xl p-8 max-w-md w-full">
-            <div className="text-center space-y-6">
-              <Moon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-yellow-400">مسابقة رمضان اليومية</h1>
-              <div className="space-y-4">
-                <Label className="text-lg block text-center mb-2">
-                  أدخل اسمك للمشاركة
-                </Label>
-                <Input
-                  type="text"
-                  placeholder="الاسم الكريم"
-                  value={gameState.playerName}
-                  onChange={(e) => setGameState(prev => ({ ...prev, playerName: e.target.value }))}
-                  className="bg-white/5 border-2 border-green-400/20 text-center text-lg py-6 rounded-xl"
-                />
-              </div>
-              <Button
-                onClick={startCountdown}
-                disabled={!gameState.playerName.trim()}
-                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 rounded-xl text-lg"
-              >
-                <Sparkles className="w-5 h-5 ml-2" />
-                بدء المسابقة
-              </Button>
-            </div>
-          </Card>
-        </div>
-      );
-    }
-
-    // عرض شاشة العد التنازلي
-    if (gameState.showCountdown) {
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-8xl font-bold text-yellow-400 mb-8">
-              {gameState.countdown}
-            </div>
-            <p className="text-3xl font-bold text-green-400">
-              استعد للتحدي!
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    const questions = dailyQuestions[gameState.currentDay] || [];
-    const currentQuestion = questions[gameState.currentQuestionIndex];
-
-    // عرض شاشة النتائج النهائية
-    if (gameState.showResults) {
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
-          <div className="max-w-2xl mx-auto">
-            <Card className="bg-white/10 backdrop-blur-lg border-2 border-yellow-400/30 rounded-2xl p-8">
-              <Trophy className="w-16 h-16 mx-auto text-yellow-400 mb-4" />
-              <h3 className="text-2xl font-bold text-yellow-400 mb-4 text-center">النتيجة النهائية</h3>
-              <p className="text-xl mb-4 text-center">
-                أحسنت يا {gameState.playerName}!
-              </p>
-              <p className="text-xl mb-6 text-center">
-                لقد حصلت على <span className="text-yellow-400 font-bold text-2xl">{gameState.score}</span> من <span className="text-yellow-400 font-bold text-2xl">{questions.length}</span> نقاط
-              </p>
-              
-              <div className="space-y-4 mt-8">
-                {questions.map((q, idx) => (
-                  <div key={idx} 
-                    className={`p-4 rounded-lg ${
-                      gameState.answers[idx]?.correct ? 'bg-green-500/20 border-green-500/30' : 'bg-red-500/20 border-red-500/30'
-                    } border-2`}
-                  >
-                    <p className="font-semibold mb-2">{q.question}</p>
-                    <p className="text-sm">
-                      إجابتك: {gameState.answers[idx]?.selected !== undefined ? q.options[gameState.answers[idx].selected] : 'لم يتم الإجابة'}
-                    </p>
-                    <p className="text-sm text-green-400">
-                      الإجابة الصحيحة: {q.options[q.correct]}
-                    </p>
-                    <p className="text-sm text-gray-400 mt-2">
-                      {q.explanation}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </div>
-      );
-    }
-
-    // عرض شاشة الأسئلة
+  // عرض شاشة البداية
+  if (!gameState.isStarted && !gameState.showCountdown) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-yellow-400 mb-2">مسابقة رمضان اليومية</h1>
-            <p className="text-lg text-green-400">أهلاً {gameState.playerName}</p>
-          </div>
-
-          <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-2xl p-6 mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-2">
-                <Timer 
-                  className="w-5 h-5 transition-colors duration-300"
-                  style={{ color: getTimerColor(gameState.timeLeft) }}
-                />
-                <span 
-                  className="text-xl font-bold transition-colors duration-300"
-                  style={{ color: getTimerColor(gameState.timeLeft) }}
-                >
-                  {gameState.timeLeft}
-                </span>
-              </div>
-              <div className="text-lg">
-                سؤال {gameState.currentQuestionIndex + 1} من {questions.length}
-              </div>
-            </div>
-
-            <div className="relative h-2 bg-gray-700/50 rounded-full overflow-hidden mb-6">
-              <div 
-                className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000"
-                style={{ 
-                  width: `${(gameState.timeLeft / 10) * 100}%`,
-                  backgroundColor: getTimerColor(gameState.timeLeft),
-                  boxShadow: `0 0 10px ${getTimerColor(gameState.timeLeft)}`
-                }}
+      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center p-6">
+        <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-3xl p-8 max-w-md w-full">
+          <div className="text-center space-y-6">
+            <Moon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-yellow-400">مسابقة رمضان اليومية</h1>
+            <div className="space-y-4">
+              <Label className="text-lg block text-center mb-2">
+                أدخل اسمك للمشاركة
+              </Label>
+              <Input
+                type="text"
+                placeholder="الاسم الكريم"
+                value={gameState.playerName}
+                onChange={(e) => setGameState(prev => ({ ...prev, playerName: e.target.value }))}
+                className="bg-white/5 border-2 border-green-400/20 text-center text-lg py-6 rounded-xl"
               />
             </div>
+            <Button
+              onClick={startCountdown}
+              disabled={!gameState.playerName.trim()}
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 rounded-xl text-lg"
+            >
+              <Sparkles className="w-5 h-5 ml-2" />
+              بدء المسابقة
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
-            <h3 className="text-xl font-semibold mb-6 pr-4 border-r-4 border-green-400">
-              {currentQuestion?.question}
-            </h3>
+  // عرض شاشة العد التنازلي
+  if (gameState.showCountdown) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-8xl font-bold text-yellow-400 mb-8">
+            {gameState.countdown}
+          </div>
+          <p className="text-3xl font-bold text-green-400">
+            استعد للتحدي!
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-            <div className="space-y-4">
-              {currentQuestion?.options.map((option, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleAnswerSelect(idx)}
-                  className={`
-                    w-full p-4 rounded-xl text-right transition-all duration-300
-                    ${gameState.selectedAnswer === idx 
-                      ? 'bg-green-500/20 border-green-400 shadow-lg shadow-green-400/20' 
-                      : 'bg-white/5 hover:bg-white/10 border-transparent hover:border-green-400/20'
-                    } 
-                    border-2
-                  `}
-                  disabled={gameState.selectedAnswer !== null}
+  const questions = dailyQuestions[gameState.currentDay] || [];
+  const currentQuestion = questions[gameState.currentQuestionIndex];
+
+  // عرض شاشة النتائج النهائية
+  if (gameState.showResults) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-white/10 backdrop-blur-lg border-2 border-yellow-400/30 rounded-2xl p-8">
+            <Trophy className="w-16 h-16 mx-auto text-yellow-400 mb-4" />
+            <h3 className="text-2xl font-bold text-yellow-400 mb-4 text-center">النتيجة النهائية</h3>
+            <p className="text-xl mb-4 text-center">
+              أحسنت يا {gameState.playerName}!
+            </p>
+            <p className="text-xl mb-6 text-center">
+              لقد حصلت على <span className="text-yellow-400 font-bold text-2xl">{gameState.score}</span> من <span className="text-yellow-400 font-bold text-2xl">{questions.length}</span> نقاط
+            </p>
+            
+            <div className="space-y-4 mt-8">
+              {questions.map((q, idx) => (
+                <div key={idx} 
+                  className={`p-4 rounded-lg ${
+                    gameState.answers[idx]?.correct ? 'bg-green-500/20 border-green-500/30' : 'bg-red-500/20 border-red-500/30'
+                  } border-2`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 text-lg">{option}</div>
-                    <div className={`
-                      w-6 h-6 rounded-full border-2 flex items-center justify-center
-                      ${gameState.selectedAnswer === idx 
-                        ? 'border-green-400 bg-green-400/20' 
-                        : 'border-green-400/50'
-                      }
-                    `}>
-                      {gameState.selectedAnswer === idx && (
-                        <div className="w-3 h-3 rounded-full bg-green-400" />
-                      )}
-                    </div>
-                  </div>
-                </button>
+                  <p className="font-semibold mb-2">{q.question}</p>
+                  <p className="text-sm">
+                    إجابتك: {gameState.answers[idx]?.selected !== undefined ? q.options[gameState.answers[idx].selected] : 'لم يتم الإجابة'}
+                  </p>
+                  <p className="text-sm text-green-400">
+                    الإجابة الصحيحة: {q.options[q.correct]}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    {q.explanation}
+                  </p>
+                </div>
               ))}
             </div>
-
-            {gameState.selectedAnswer !== null && currentQuestion?.explanation && (
-              <div className="mt-4 p-4 bg-white/5 rounded-xl border border-green-400/20">
-                <p className="text-sm text-gray-300">{currentQuestion.explanation}</p>
-              </div>
-            )}
           </Card>
         </div>
       </div>
     );
-  };
+  }
 
-  export default RamadanQuiz;
+  // عرض شاشة الأسئلة
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-yellow-400 mb-2">مسابقة رمضان اليومية</h1>
+          <p className="text-lg text-green-400">أهلاً {gameState.playerName}</p>
+        </div>
+
+        <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-2xl p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
+              <Timer 
+                className="w-5 h-5 transition-colors duration-300"
+                style={{ color: getTimerColor(gameState.timeLeft) }}
+              />
+              <span 
+                className="text-xl font-bold transition-colors duration-300"
+                style={{ color: getTimerColor(gameState.timeLeft) }}
+              >
+                {gameState.timeLeft}
+              </span>
+            </div>
+            <div className="text-lg">
+              سؤال {gameState.currentQuestionIndex + 1} من {questions.length}
+            </div>
+          </div>
+
+          <div className="relative h-2 bg-gray-700/50 rounded-full overflow-hidden mb-6">
+            <div 
+              className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000"
+              style={{ 
+                width: `${(gameState.timeLeft / 10) * 100}%`,
+                backgroundColor: getTimerColor(gameState.timeLeft),
+                boxShadow: `0 0 10px ${getTimerColor(gameState.timeLeft)}`
+              }}
+            />
+          </div>
+
+          <h3 className="text-xl font-semibold mb-6 pr-4 border-r-4 border-green-400">
+            {currentQuestion?.question}
+          </h3>
+
+          <div className="space-y-4">
+            {currentQuestion?.options.map((option, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleAnswerSelect(idx)}
+                className={`
+                  w-full p-4 rounded-xl text-right transition-all duration-300
+                  ${gameState.selectedAnswer === idx 
+                    ? 'bg-green-500/20 border-green-400 shadow-lg shadow-green-400/20' 
+                    : 'bg-white/5 hover:bg-white/10 border-transparent hover:border-green-400/20'
+                  } 
+                  border-2
+                `}
+                disabled={gameState.selectedAnswer !== null}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 text-lg">{option}</div>
+                  <div className={`
+                    w-6 h-6 rounded-full border-2 flex items-center justify-center
+                    ${gameState.selectedAnswer === idx 
+                      ? 'border-green-400 bg-green-400/20' 
+                      : 'border-green-400/50'
+                    }
+                  `}>
+                    {gameState.selectedAnswer === idx && (
+                      <div className="w-3 h-3 rounded-full bg-green-400" />
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {gameState.selectedAnswer !== null && currentQuestion?.explanation && (
+            <div className="mt-4 p-4 bg-white/5 rounded-xl border border-green-400/20">
+              <p className="text-sm text-gray-300">{currentQuestion.explanation}</p>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default RamadanQuiz;
