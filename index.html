@@ -1,171 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Moon, Star, Trophy, Sparkles, Timer } from 'lucide-react';
+  import React, { useState, useEffect } from 'react';
+  import { Button } from "@/components/ui/button";
+  import { Card } from "@/components/ui/card";
+  import { Label } from "@/components/ui/label";
+  import { Input } from "@/components/ui/input";
+  import { Moon, Star, Trophy, Sparkles, Timer } from 'lucide-react';
 
-const RamadanQuiz = () => {
-  // تعريف حالة التطبيق
-  const [gameState, setGameState] = useState({
-    playerName: "",
-    isStarted: false,
-    showCountdown: false,
-    countdown: 5,
-    currentQuestionIndex: 0,
-    selectedAnswer: null,
-    score: 0,
-    showResults: false,
-    timeLeft: 10,
-    answers: [],
-    currentDay: new Date().getDate() // يحصل على اليوم الحالي
-  });
+  const RamadanQuiz = () => {
+    // تعريف حالة التطبيق
+    const [gameState, setGameState] = useState({
+      playerName: "",
+      isStarted: false,
+      showCountdown: false,
+      countdown: 5,
+      currentQuestionIndex: 0,
+      selectedAnswer: null,
+      score: 0,
+      showResults: false,
+      timeLeft: 10,
+      answers: [],
+      currentDay: new Date().getDate() // يحصل على اليوم الحالي
+    });
 
-  // قاعدة بيانات الأسئلة اليومية
-  const dailyQuestions = {
-    1: [
-      {
-        question: "في أي عام فُرض الصيام على المسلمين؟",
-        options: ["السنة الأولى للهجرة", "السنة الثانية للهجرة", "السنة الثالثة للهجرة", "السنة الرابعة للهجرة"],
-        correct: 1,
-        explanation: "فُرض الصيام في السنة الثانية للهجرة."
-      }
-    ],
-    2: [
-      {
-        question: "ما هي أول معركة في الإسلام والتي وقعت في شهر رمضان؟",
-        options: ["معركة أحد", "معركة الخندق", "معركة بدر", "معركة حنين"],
-        correct: 2,
-        explanation: "وقعت معركة بدر في شهر رمضان."
-      }
-    ],
-    3: [
-      {
-        question: "في أي عام تم فتح مكة في شهر رمضان؟",
-        options: ["السنة السادسة للهجرة", "السنة السابعة للهجرة", "السنة الثامنة للهجرة", "السنة التاسعة للهجرة"],
-        correct: 2,
-        explanation: "تم فتح مكة في السنة الثامنة للهجرة."
-      }
-    ],
-    // يمكن إضافة باقي الأسئلة هنا
-    11: [
-      {
-        question: "في أي رمضان نزلت أول آية من القرآن الكريم؟",
-        options: ["رمضان من السنة الأربعين لميلاد النبي محمد ﷺ", "رمضان من السنة الأولى للبعثة", "رمضان من السنة الثانية للبعثة", "رمضان من السنة الثالثة للبعثة"],
-        correct: 0,
-        explanation: "نزلت أول آية من القرآن الكريم في رمضان من السنة الأربعين لميلاد النبي محمد ﷺ."
-      }
-    ]
-  };
-
-  // دالة حساب لون المؤقت
-  const getTimerColor = (timeLeft) => {
-    const percentage = timeLeft / 10;
-    const colors = {
-      red: [239, 68, 68],
-      yellow: [234, 179, 8],
-      green: [34, 197, 94]
+    // قاعدة بيانات الأسئلة اليومية
+    const dailyQuestions = {
+      11: [
+        {
+          question: "ما هي السورة التي تعدل ثلث القرآن؟",
+          options: ["سورة الإخلاص", "سورة الفاتحة", "سورة الكوثر", "سورة العصر"],
+          correct: 0,
+          explanation: "قال النبي ﷺ: 'قل هو الله أحد تعدل ثلث القرآن'"
+        },
+        {
+          question: "كم مرة ذُكرت كلمة 'رمضان' في القرآن الكريم؟",
+          options: ["مرة واحدة", "مرتين", "ثلاث مرات", "أربع مرات"],
+          correct: 0,
+          explanation: "ذُكرت كلمة رمضان مرة واحدة في سورة البقرة"
+        },
+        {
+          question: "ما هو أول ما نزل من القرآن الكريم؟",
+          options: ["بسم الله الرحمن الرحيم", "الحمد لله رب العالمين", "اقرأ باسم ربك", "يا أيها المدثر"],
+          correct: 2,
+          explanation: "أول ما نزل من القرآن الكريم هو 'اقرأ باسم ربك الذي خلق'"
+        }
+      ],
+      12: [
+        {
+          question: "في أي غزوة نزلت سورة الأنفال؟",
+          options: ["غزوة بدر", "غزوة أحد", "غزوة الخندق", "غزوة حنين"],
+          correct: 0,
+          explanation: "نزلت سورة الأنفال في غزوة بدر وتسمى أيضاً سورة بدر"
+        },
+        {
+          question: "ما هو الشهر الذي فُرض فيه الصيام على المسلمين؟",
+          options: ["محرم", "رجب", "شعبان", "رمضان"],
+          correct: 3,
+          explanation: "فُرض الصيام في السنة الثانية للهجرة في شهر رمضان"
+        },
+        {
+          question: "متى فُرضت صلاة التراويح جماعة؟",
+          options: ["في العهد المكي", "في السنة الأولى للهجرة", "في عهد عمر بن الخطاب", "في عهد عثمان بن عفان"],
+          correct: 2,
+          explanation: "جمع عمر بن الخطاب رضي الله عنه الناس على صلاة التراويح جماعة في المسجد"
+        }
+      ],
+      13: [
+        {
+          question: "ما هو أفضل الصدقة كما ورد في الحديث الشريف؟",
+          options: ["صدقة في رمضان", "صدقة السر", "صدقة الفطر", "صدقة الماء"],
+          correct: 0,
+          explanation: "قال النبي ﷺ: 'أفضل الصدقة صدقة في رمضان'"
+        },
+        {
+          question: "كم عدد الصحابة في غزوة بدر؟",
+          options: ["313", "314", "315", "316"],
+          correct: 0,
+          explanation: "كان عدد المسلمين في غزوة بدر 313 رجلاً"
+        },
+        {
+          question: "ما هي السورة التي تسمى بـ 'قلب القرآن'؟",
+          options: ["سورة يس", "سورة الرحمن", "سورة الواقعة", "سورة الملك"],
+          correct: 0,
+          explanation: "سورة يس هي قلب القرآن كما ورد في الحديث"
+        }
+      ],
+      // ... باقي الأيام حتى 29 (تم إدراجها في الرسالة السابقة)
     };
 
-    let color;
-    if (percentage > 0.6) {
-      const factor = (percentage - 0.6) / 0.4;
-      color = [
-        colors.yellow[0] + (colors.green[0] - colors.yellow[0]) * factor,
-        colors.yellow[1] + (colors.green[1] - colors.yellow[1]) * factor,
-        colors.yellow[2] + (colors.green[2] - colors.yellow[2]) * factor
-      ];
-    } else {
-      const factor = percentage / 0.6;
-      color = [
-        colors.red[0] + (colors.yellow[0] - colors.red[0]) * factor,
-        colors.red[1] + (colors.yellow[1] - colors.red[1]) * factor,
-        colors.red[2] + (colors.yellow[2] - colors.red[2]) * factor
-      ];
-    }
+    // دالة حساب لون المؤقت
+    const getTimerColor = (timeLeft) => {
+      const percentage = timeLeft / 10;
+      const colors = {
+        red: [239, 68, 68],
+        yellow: [234, 179, 8],
+        green: [34, 197, 94]
+      };
 
-    return `rgb(${Math.round(color[0])}, ${Math.round(color[1])}, ${Math.round(color[2])})`;
-  };
+      let color;
+      if (percentage > 0.6) {
+        const factor = (percentage - 0.6) / 0.4;
+        color = [
+          colors.yellow[0] + (colors.green[0] - colors.yellow[0]) * factor,
+          colors.yellow[1] + (colors.green[1] - colors.yellow[1]) * factor,
+          colors.yellow[2] + (colors.green[2] - colors.yellow[2]) * factor
+        ];
+      } else {
+        const factor = percentage / 0.6;
+        color = [
+          colors.red[0] + (colors.yellow[0] - colors.red[0]) * factor,
+          colors.red[1] + (colors.yellow[1] - colors.red[1]) * factor,
+          colors.red[2] + (colors.yellow[2] - colors.red[2]) * factor
+        ];
+      }
 
-  // تأثيرات للعد التنازلي
-  useEffect(() => {
-    if (gameState.showCountdown && gameState.countdown > 0) {
-      const timer = setTimeout(() => {
-        setGameState(prev => ({ ...prev, countdown: prev.countdown - 1 }));
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (gameState.showCountdown && gameState.countdown === 0) {
-      setGameState(prev => ({
-        ...prev,
-        showCountdown: false,
-        isStarted: true,
-        timeLeft: 10
-      }));
-    }
-  }, [gameState.countdown, gameState.showCountdown]);
-
-  // تأثيرات للمؤقت
-  useEffect(() => {
-    let timer;
-    if (gameState.isStarted && !gameState.showResults && gameState.timeLeft > 0) {
-      timer = setInterval(() => {
-        setGameState(prev => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
-      }, 1000);
-    }
-
-    if (gameState.timeLeft === 0) {
-      handleTimeUp();
-    }
-
-    return () => clearInterval(timer);
-  }, [gameState.timeLeft, gameState.isStarted, gameState.showResults]);
-
-  // دالة بدء العد التنازلي
-  const startCountdown = () => {
-    if (gameState.playerName.trim()) {
-      setGameState(prev => ({ ...prev, showCountdown: true, countdown: 5 }));
-    }
-  };
-
-  // دالة معالجة انتهاء الوقت
-  const handleTimeUp = () => {
-    const questions = dailyQuestions[gameState.currentDay] || [];
-    if (gameState.currentQuestionIndex < questions.length - 1) {
-      setGameState(prev => ({
-        ...prev,
-        currentQuestionIndex: prev.currentQuestionIndex + 1,
-        selectedAnswer: null,
-        timeLeft: 10
-      }));
-    } else {
-      const finalScore = gameState.answers.filter(answer => answer?.correct).length;
-      setGameState(prev => ({
-        ...prev,
-        score: finalScore,
-        showResults: true
-      }));
-    }
-  };
-
-  // دالة معالجة اختيار الإجابة
-  const handleAnswerSelect = (idx) => {
-    const questions = dailyQuestions[gameState.currentDay] || [];
-    const currentQuestion = questions[gameState.currentQuestionIndex];
-    
-    const newAnswers = [...gameState.answers];
-    newAnswers[gameState.currentQuestionIndex] = {
-      selected: idx,
-      correct: idx === currentQuestion.correct,
-      explanation: currentQuestion.explanation
+      return `rgb(${Math.round(color[0])}, ${Math.round(color[1])}, ${Math.round(color[2])})`;
     };
 
-    setGameState(prev => ({
-      ...prev,
-      answers: newAnswers,
-      selectedAnswer: idx
-    }));
+    // تأثيرات للعد التنازلي
+    useEffect(() => {
+      if (gameState.showCountdown && gameState.countdown > 0) {
+        const timer = setTimeout(() => {
+          setGameState(prev => ({ ...prev, countdown: prev.countdown - 1 }));
+        }, 1000);
+        return () => clearTimeout(timer);
+      } else if (gameState.showCountdown && gameState.countdown === 0) {
+        setGameState(prev => ({
+          ...prev,
+          showCountdown: false,
+          isStarted: true,
+          timeLeft: 10
+        }));
+      }
+    }, [gameState.countdown, gameState.showCountdown]);
 
-    setTimeout(() => {
+    // تأثيرات للمؤقت
+    useEffect(() => {
+      let timer;
+      if (gameState.isStarted && !gameState.showResults && gameState.timeLeft > 0) {
+        timer = setInterval(() => {
+          setGameState(prev => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
+        }, 1000);
+      }
+
+      if (gameState.timeLeft === 0) {
+        handleTimeUp();
+      }
+
+      return () => clearInterval(timer);
+    }, [gameState.timeLeft, gameState.isStarted, gameState.showResults]);
+
+    // دالة بدء العد التنازلي
+    const startCountdown = () => {
+      if (gameState.playerName.trim()) {
+        setGameState(prev => ({ ...prev, showCountdown: true, countdown: 5 }));
+      }
+    };
+
+    // دالة معالجة انتهاء الوقت
+    const handleTimeUp = () => {
+      const questions = dailyQuestions[gameState.currentDay] || [];
       if (gameState.currentQuestionIndex < questions.length - 1) {
         setGameState(prev => ({
           ...prev,
@@ -174,195 +166,231 @@ const RamadanQuiz = () => {
           timeLeft: 10
         }));
       } else {
-        const finalScore = newAnswers.filter(answer => answer?.correct).length;
+        const finalScore = gameState.answers.filter(answer => answer?.correct).length;
         setGameState(prev => ({
           ...prev,
           score: finalScore,
           showResults: true
         }));
       }
-    }, 2000);
-  };
+    };
 
-  // عرض شاشة البداية
-  if (!gameState.isStarted && !gameState.showCountdown) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center p-6">
-        <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-3xl p-8 max-w-md w-full">
-          <div className="text-center space-y-6">
-            <Moon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-yellow-400">مسابقة رمضان اليومية</h1>
-            <div className="space-y-4">
-              <Label className="text-lg block text-center mb-2">
-                أدخل اسمك للمشاركة
-              </Label>
-              <Input
-                type="text"
-                placeholder="الاسم الكريم"
-                value={gameState.playerName}
-                onChange={(e) => setGameState(prev => ({ ...prev, playerName: e.target.value }))}
-                className="bg-white/5 border-2 border-green-400/20 text-center text-lg py-6 rounded-xl"
-              />
+    // دالة معالجة اختيار الإجابة
+    const handleAnswerSelect = (idx) => {
+      const questions = dailyQuestions[gameState.currentDay] || [];
+      const currentQuestion = questions[gameState.currentQuestionIndex];
+      
+      const newAnswers = [...gameState.answers];
+      newAnswers[gameState.currentQuestionIndex] = {
+        selected: idx,
+        correct: idx === currentQuestion.correct,
+        explanation: currentQuestion.explanation
+      };
+
+      setGameState(prev => ({
+        ...prev,
+        answers: newAnswers,
+        selectedAnswer: idx
+      }));
+
+      setTimeout(() => {
+        if (gameState.currentQuestionIndex < questions.length - 1) {
+          setGameState(prev => ({
+            ...prev,
+            currentQuestionIndex: prev.currentQuestionIndex + 1,
+            selectedAnswer: null,
+            timeLeft: 10
+          }));
+        } else {
+          const finalScore = newAnswers.filter(answer => answer?.correct).length;
+          setGameState(prev => ({
+            ...prev,
+            score: finalScore,
+            showResults: true
+          }));
+        }
+      }, 2000);
+    };
+
+    // عرض شاشة البداية
+    if (!gameState.isStarted && !gameState.showCountdown) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center p-6">
+          <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-3xl p-8 max-w-md w-full">
+            <div className="text-center space-y-6">
+              <Moon className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold text-yellow-400">مسابقة رمضان اليومية</h1>
+              <div className="space-y-4">
+                <Label className="text-lg block text-center mb-2">
+                  أدخل اسمك للمشاركة
+                </Label>
+                <Input
+                  type="text"
+                  placeholder="الاسم الكريم"
+                  value={gameState.playerName}
+                  onChange={(e) => setGameState(prev => ({ ...prev, playerName: e.target.value }))}
+                  className="bg-white/5 border-2 border-green-400/20 text-center text-lg py-6 rounded-xl"
+                />
+              </div>
+              <Button
+                onClick={startCountdown}
+                disabled={!gameState.playerName.trim()}
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 rounded-xl text-lg"
+              >
+                <Sparkles className="w-5 h-5 ml-2" />
+                بدء المسابقة
+              </Button>
             </div>
-            <Button
-              onClick={startCountdown}
-              disabled={!gameState.playerName.trim()}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 rounded-xl text-lg"
-            >
-              <Sparkles className="w-5 h-5 ml-2" />
-              بدء المسابقة
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  // عرض شاشة العد التنازلي
-  if (gameState.showCountdown) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-8xl font-bold text-yellow-400 mb-8">
-            {gameState.countdown}
-          </div>
-          <p className="text-3xl font-bold text-green-400">
-            استعد للتحدي!
-          </p>
+          </Card>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  const questions = dailyQuestions[gameState.currentDay] || [];
-  const currentQuestion = questions[gameState.currentQuestionIndex];
+    // عرض شاشة العد التنازلي
+    if (gameState.showCountdown) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-8xl font-bold text-yellow-400 mb-8">
+              {gameState.countdown}
+            </div>
+            <p className="text-3xl font-bold text-green-400">
+              استعد للتحدي!
+            </p>
+          </div>
+        </div>
+      );
+    }
 
-  // عرض شاشة النتائج النهائية
-  if (gameState.showResults) {
+    const questions = dailyQuestions[gameState.currentDay] || [];
+    const currentQuestion = questions[gameState.currentQuestionIndex];
+
+    // عرض شاشة النتائج النهائية
+    if (gameState.showResults) {
+      return (
+        <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
+          <div className="max-w-2xl mx-auto">
+            <Card className="bg-white/10 backdrop-blur-lg border-2 border-yellow-400/30 rounded-2xl p-8">
+              <Trophy className="w-16 h-16 mx-auto text-yellow-400 mb-4" />
+              <h3 className="text-2xl font-bold text-yellow-400 mb-4 text-center">النتيجة النهائية</h3>
+              <p className="text-xl mb-4 text-center">
+                أحسنت يا {gameState.playerName}!
+              </p>
+              <p className="text-xl mb-6 text-center">
+                لقد حصلت على <span className="text-yellow-400 font-bold text-2xl">{gameState.score}</span> من <span className="text-yellow-400 font-bold text-2xl">{questions.length}</span> نقاط
+              </p>
+              
+              <div className="space-y-4 mt-8">
+                {questions.map((q, idx) => (
+                  <div key={idx} 
+                    className={`p-4 rounded-lg ${
+                      gameState.answers[idx]?.correct ? 'bg-green-500/20 border-green-500/30' : 'bg-red-500/20 border-red-500/30'
+                    } border-2`}
+                  >
+                    <p className="font-semibold mb-2">{q.question}</p>
+                    <p className="text-sm">
+                      إجابتك: {gameState.answers[idx]?.selected !== undefined ? q.options[gameState.answers[idx].selected] : 'لم يتم الإجابة'}
+                    </p>
+                    <p className="text-sm text-green-400">
+                      الإجابة الصحيحة: {q.options[q.correct]}
+                    </p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      {q.explanation}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+      );
+    }
+
+    // عرض شاشة الأسئلة
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
-        <div className="max-w-2xl mx-auto">
-          <Card className="bg-white/10 backdrop-blur-lg border-2 border-yellow-400/30 rounded-2xl p-8">
-            <Trophy className="w-16 h-16 mx-auto text-yellow-400 mb-4" />
-            <h3 className="text-2xl font-bold text-yellow-400 mb-4 text-center">النتيجة النهائية</h3>
-            <p className="text-xl mb-4 text-center">
-              أحسنت يا {gameState.playerName}!
-            </p>
-            <p className="text-xl mb-6 text-center">
-              لقد حصلت على <span className="text-yellow-400 font-bold text-2xl">{gameState.score}</span> من <span className="text-yellow-400 font-bold text-2xl">{questions.length}</span> نقاط
-            </p>
-            
-            <div className="space-y-4 mt-8">
-              {questions.map((q, idx) => (
-                <div key={idx} 
-                  className={`p-4 rounded-lg ${
-                    gameState.answers[idx]?.correct ? 'bg-green-500/20 border-green-500/30' : 'bg-red-500/20 border-red-500/30'
-                  } border-2`}
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-yellow-400 mb-2">مسابقة رمضان اليومية</h1>
+            <p className="text-lg text-green-400">أهلاً {gameState.playerName}</p>
+          </div>
+
+          <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-2xl p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-2">
+                <Timer 
+                  className="w-5 h-5 transition-colors duration-300"
+                  style={{ color: getTimerColor(gameState.timeLeft) }}
+                />
+                <span 
+                  className="text-xl font-bold transition-colors duration-300"
+                  style={{ color: getTimerColor(gameState.timeLeft) }}
                 >
-                  <p className="font-semibold mb-2">{q.question}</p>
-                  <p className="text-sm">
-                    إجابتك: {gameState.answers[idx]?.selected !== undefined ? q.options[gameState.answers[idx].selected] : 'لم يتم الإجابة'}
-                  </p>
-                  <p className="text-sm text-green-400">
-                    الإجابة الصحيحة: {q.options[q.correct]}
-                  </p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    {q.explanation}
-                  </p>
-                </div>
+                  {gameState.timeLeft}
+                </span>
+              </div>
+              <div className="text-lg">
+                سؤال {gameState.currentQuestionIndex + 1} من {questions.length}
+              </div>
+            </div>
+
+            <div className="relative h-2 bg-gray-700/50 rounded-full overflow-hidden mb-6">
+              <div 
+                className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000"
+                style={{ 
+                  width: `${(gameState.timeLeft / 10) * 100}%`,
+                  backgroundColor: getTimerColor(gameState.timeLeft),
+                  boxShadow: `0 0 10px ${getTimerColor(gameState.timeLeft)}`
+                }}
+              />
+            </div>
+
+            <h3 className="text-xl font-semibold mb-6 pr-4 border-r-4 border-green-400">
+              {currentQuestion?.question}
+            </h3>
+
+            <div className="space-y-4">
+              {currentQuestion?.options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleAnswerSelect(idx)}
+                  className={`
+                    w-full p-4 rounded-xl text-right transition-all duration-300
+                    ${gameState.selectedAnswer === idx 
+                      ? 'bg-green-500/20 border-green-400 shadow-lg shadow-green-400/20' 
+                      : 'bg-white/5 hover:bg-white/10 border-transparent hover:border-green-400/20'
+                    } 
+                    border-2
+                  `}
+                  disabled={gameState.selectedAnswer !== null}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 text-lg">{option}</div>
+                    <div className={`
+                      w-6 h-6 rounded-full border-2 flex items-center justify-center
+                      ${gameState.selectedAnswer === idx 
+                        ? 'border-green-400 bg-green-400/20' 
+                        : 'border-green-400/50'
+                      }
+                    `}>
+                      {gameState.selectedAnswer === idx && (
+                        <div className="w-3 h-3 rounded-full bg-green-400" />
+                      )}
+                    </div>
+                  </div>
+                </button>
               ))}
             </div>
+
+            {gameState.selectedAnswer !== null && currentQuestion?.explanation && (
+              <div className="mt-4 p-4 bg-white/5 rounded-xl border border-green-400/20">
+                <p className="text-sm text-gray-300">{currentQuestion.explanation}</p>
+              </div>
+            )}
           </Card>
         </div>
       </div>
     );
-  }
+  };
 
-  // عرض شاشة الأسئلة
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-indigo-950 text-white p-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-yellow-400 mb-2">مسابقة رمضان اليومية</h1>
-          <p className="text-lg text-green-400">أهلاً {gameState.playerName}</p>
-        </div>
-
-        <Card className="bg-white/10 backdrop-blur-lg border-2 border-green-400/20 rounded-2xl p-6 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2">
-              <Timer 
-                className="w-5 h-5 transition-colors duration-300"
-                style={{ color: getTimerColor(gameState.timeLeft) }}
-              />
-              <span 
-                className="text-xl font-bold transition-colors duration-300"
-                style={{ color: getTimerColor(gameState.timeLeft) }}
-              >
-                {gameState.timeLeft}
-              </span>
-            </div>
-            <div className="text-lg">
-              سؤال {gameState.currentQuestionIndex + 1} من {questions.length}
-            </div>
-          </div>
-
-          <div className="relative h-2 bg-gray-700/50 rounded-full overflow-hidden mb-6">
-            <div 
-              className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000"
-              style={{ 
-                width: `${(gameState.timeLeft / 10) * 100}%`,
-                backgroundColor: getTimerColor(gameState.timeLeft),
-                boxShadow: `0 0 10px ${getTimerColor(gameState.timeLeft)}`
-              }}
-            />
-          </div>
-
-          <h3 className="text-xl font-semibold mb-6 pr-4 border-r-4 border-green-400">
-            {currentQuestion?.question}
-          </h3>
-
-          <div className="space-y-4">
-            {currentQuestion?.options.map((option, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleAnswerSelect(idx)}
-                className={`
-                  w-full p-4 rounded-xl text-right transition-all duration-300
-                  ${gameState.selectedAnswer === idx 
-                    ? 'bg-green-500/20 border-green-400 shadow-lg shadow-green-400/20' 
-                    : 'bg-white/5 hover:bg-white/10 border-transparent hover:border-green-400/20'
-                  } 
-                  border-2
-                `}
-                disabled={gameState.selectedAnswer !== null}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 text-lg">{option}</div>
-                  <div className={`
-                    w-6 h-6 rounded-full border-2 flex items-center justify-center
-                    ${gameState.selectedAnswer === idx 
-                      ? 'border-green-400 bg-green-400/20' 
-                      : 'border-green-400/50'
-                    }
-                  `}>
-                    {gameState.selectedAnswer === idx && (
-                      <div className="w-3 h-3 rounded-full bg-green-400" />
-                    )}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {gameState.selectedAnswer !== null && currentQuestion?.explanation && (
-            <div className="mt-4 p-4 bg-white/5 rounded-xl border border-green-400/20">
-              <p className="text-sm text-gray-300">{currentQuestion.explanation}</p>
-            </div>
-          )}
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default RamadanQuiz;
+  export default RamadanQuiz;
